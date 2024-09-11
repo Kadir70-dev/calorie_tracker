@@ -14,24 +14,34 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# calorie_tracker/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
+from tracker import views
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework import permissions
+from rest_framework.permissions import AllowAny
+
+router = routers.DefaultRouter()
+router.register(r'food-items', views.FoodItemViewSet)
+router.register(r'activities', views.ActivityViewSet)
+router.register(r'daily-intakes', views.DailyIntakeViewSet)
+router.register(r'daily-activities', views.DailyActivityViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(
       title="Calorie Tracker API",
       default_version='v1',
-      description="API for tracking food items and their calories",
+      description="API documentation for the Calorie Tracker",
    ),
    public=True,
-   permission_classes=(permissions.AllowAny,),
+   permission_classes=(AllowAny,),
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('tracker.urls')),
+    path('api/', include(router.urls)),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
